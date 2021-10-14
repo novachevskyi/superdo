@@ -11,6 +11,7 @@
         android:layout_height="32dp"
         android:layout_margin="12dp"
         android:background="@drawable/circle_shape"
+        android:transitionName="CircleTransition"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

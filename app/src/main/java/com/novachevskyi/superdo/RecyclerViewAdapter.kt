@@ -13,10 +13,9 @@ import android.widget.TextView
 class RecyclerViewAdapter internal constructor(private val context: Context, data: List<DataModel>) :
     RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
-    private val data: MutableList<DataModel> = data.toMutableList()
+    val data: MutableList<DataModel> = data.toMutableList()
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var clickListener: ItemClickListener? = null
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = inflater.inflate(R.layout.shop_item, parent, false)
@@ -45,7 +44,7 @@ class RecyclerViewAdapter internal constructor(private val context: Context, dat
         var weight: TextView = itemView.findViewById(R.id.weight)
 
         override fun onClick(view: View) {
-            if (clickListener != null) clickListener?.onItemClick(view, adapterPosition)
+            if (clickListener != null) clickListener?.onItemClick(circleView, Color.parseColor(data[adapterPosition].bagColor))
         }
 
         init {
@@ -67,6 +66,6 @@ class RecyclerViewAdapter internal constructor(private val context: Context, dat
     }
 
     interface ItemClickListener {
-        fun onItemClick(view: View?, position: Int)
+        fun onItemClick(view: ImageView, color: Int)
     }
 }
