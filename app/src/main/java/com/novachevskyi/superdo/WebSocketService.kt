@@ -9,24 +9,52 @@ import kotlinx.coroutines.withContext
 
 class WebSocketService {
 
-    fun listenSocket(dataCallback: (DataModel) -> Unit) {
-        val ws = WebSocketFactory().createSocket("ws://superdo-groceries.herokuapp.com/receive", 5000)
-        ws.addListener(object: WebSocketAdapter() {
-            override fun onTextMessage(websocket: WebSocket, message: String) {
-                super.onTextMessage(websocket, message)
-                val dataModel = Gson().fromJson(message, DataModel::class.java)
-                dataCallback.invoke(dataModel)
-            }
-        })
+    private var webSocket: WebSocket? = null
 
+    private var isDisconnecting = false
+
+    fun listenSocket(connectedCallback: (Boolean) -> Unit, dataCallback: (DataModel) -> Unit) {
+        webSocket = WebSocketFactory().createSocket("ws://superdo-groceries.herokuapp.com/receive", 5000).apply {
+            addListener(object: WebSocketAdapter() {
+                override fun onTextMessage(websocket: WebSocket, message: String) {
+                    super.onTextMessage(websocket, message)
+                    if (!isDisconnecting) {
+                        val dataModel = Gson().fromJson(message, DataModel::class.java)
+                        dataCallback.invoke(dataModel)
+                    }
+                }
+
+                override fun onConnected(
+                    websocket: WebSocket?,
+                    headers: MutableMap<String, MutableList<String>>?
+                ) {
+                    super.onConnected(websocket, headers)
+                    connectedCallback.invoke(true)
+                }
+            })
+
+            GlobalScope.launch {
+                withContext(Dispatchers.IO) {
+                    try {
+                        isDisconnecting = false
+                        connect()
+                    } catch (e: OpeningHandshakeException) {
+                        connectedCallback.invoke(false)
+                    } catch (e: HostnameUnverifiedException) {
+                        connectedCallback.invoke(false)
+                    } catch (e: WebSocketException) {
+                        connectedCallback.invoke(false)
+                    }
+                }
+            }
+        }
+    }
+
+    fun disconnect() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                try {
-                    ws.connect()
-                } catch (e: OpeningHandshakeException) {
-                } catch (e: HostnameUnverifiedException) {
-                } catch (e: WebSocketException) {
-                }
+                isDisconnecting = true
+                webSocket?.disconnect()
             }
         }
     }

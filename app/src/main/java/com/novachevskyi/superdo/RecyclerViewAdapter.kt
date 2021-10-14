@@ -10,21 +10,21 @@ import android.widget.ImageView
 import android.graphics.drawable.GradientDrawable
 import android.widget.TextView
 
-class MyRecyclerViewAdapter internal constructor(private val context: Context, data: List<DataModel>) :
-    RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter internal constructor(private val context: Context, data: List<DataModel>) :
+    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
-    private val mData: MutableList<DataModel> = data.toMutableList()
-    private val mInflater: LayoutInflater = LayoutInflater.from(context)
-    private var mClickListener: ItemClickListener? = null
+    private val data: MutableList<DataModel> = data.toMutableList()
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+    private var clickListener: ItemClickListener? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = mInflater.inflate(R.layout.shop_item, parent, false)
+        val view = inflater.inflate(R.layout.shop_item, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val shopItem = mData[position]
+        val shopItem = data[position]
 
         val bgShape = holder.circleView.background as GradientDrawable
         bgShape.setColor(Color.parseColor(shopItem.bagColor))
@@ -34,7 +34,7 @@ class MyRecyclerViewAdapter internal constructor(private val context: Context, d
     }
 
     override fun getItemCount(): Int {
-        return mData.size
+        return data.size
     }
 
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -45,7 +45,7 @@ class MyRecyclerViewAdapter internal constructor(private val context: Context, d
         var weight: TextView = itemView.findViewById(R.id.weight)
 
         override fun onClick(view: View) {
-            if (mClickListener != null) mClickListener!!.onItemClick(view, adapterPosition)
+            if (clickListener != null) clickListener?.onItemClick(view, adapterPosition)
         }
 
         init {
@@ -54,15 +54,15 @@ class MyRecyclerViewAdapter internal constructor(private val context: Context, d
     }
 
     fun getItem(id: Int): DataModel {
-        return mData[id]
+        return data[id]
     }
 
     fun setClickListener(itemClickListener: ItemClickListener?) {
-        mClickListener = itemClickListener
+        clickListener = itemClickListener
     }
 
     fun addItem(item: DataModel) {
-        mData.add(0, item)
+        data.add(0, item)
         notifyItemInserted(0)
     }
 
