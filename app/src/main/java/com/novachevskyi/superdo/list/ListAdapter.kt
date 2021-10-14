@@ -1,4 +1,4 @@
-package com.novachevskyi.superdo
+package com.novachevskyi.superdo.list
 
 import android.content.Context
 import android.graphics.Color
@@ -9,16 +9,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.graphics.drawable.GradientDrawable
 import android.widget.TextView
+import com.novachevskyi.superdo.DataModel
+import com.novachevskyi.superdo.R
 
-class RecyclerViewAdapter internal constructor(private val context: Context, data: List<DataModel>) :
-    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class ListAdapter internal constructor(private val context: Context, data: List<DataModel>) :
+    RecyclerView.Adapter<ListAdapter.ViewHolder>() {
 
     val data: MutableList<DataModel> = data.toMutableList()
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var clickListener: ItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = inflater.inflate(R.layout.shop_item, parent, false)
+        val view = inflater.inflate(R.layout.list_item, parent, false)
         return ViewHolder(view)
     }
 

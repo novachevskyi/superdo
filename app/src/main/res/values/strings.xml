@@ -3,4 +3,6 @@
     <string name="connect">Connect</string>
     <string name="connecting">Connecting...</string>
     <string name="disconnect">Disconnect</string>
+    <string name="circle_transition">CircleTransition</string>
+    <string name="color_key">color</string>
 </resources>

@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SuperDo">
         <activity
-            android:name=".MainActivity"
+            android:name=".list.ListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.novachevskyi.superdo
+package com.novachevskyi.superdo.list
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,28 +9,33 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.novachevskyi.superdo.databinding.FragmentFirstBinding
+import com.novachevskyi.superdo.DetailActivity
+import com.novachevskyi.superdo.R
+import com.novachevskyi.superdo.WebSocketService
+import com.novachevskyi.superdo.databinding.FragmentListBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FirstFragment : Fragment(), RecyclerViewAdapter.ItemClickListener {
+class ListFragment : Fragment(), ListAdapter.ItemClickListener {
 
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: FragmentListBinding? = null
 
     private val binding get() = _binding!!
 
-    private lateinit var adapter: RecyclerViewAdapter
+    private lateinit var adapter: ListAdapter
+
+    private val service = WebSocketService()
+
+    private var isConnectState = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,32 +46,9 @@ class FirstFragment : Fragment(), RecyclerViewAdapter.ItemClickListener {
     }
 
     private fun initConnection() {
-        val service = WebSocketService()
-        var isConnectState = true
         binding.connect.setOnClickListener {
             if (isConnectState) {
-                binding.connect.setText(R.string.connecting)
-                binding.connect.isEnabled = false
-
-                service.listenSocket({
-                    GlobalScope.launch {
-                        withContext(Dispatchers.Main) {
-                            binding.connect.isEnabled = true
-                            binding.connect.setText(
-                                if (it) {
-                                    isConnectState = false
-                                    R.string.disconnect
-                                } else {
-                                    isConnectState = true
-                                    R.string.connect
-                                }
-                            )
-                        }
-                    }
-                }) {
-                    adapter.addItem(it)
-                    binding.recyclerView.smoothScrollToPosition(0)
-                }
+                handleConnectState()
             } else {
                 service.disconnect()
                 isConnectState = true
@@ -75,10 +57,35 @@ class FirstFragment : Fragment(), RecyclerViewAdapter.ItemClickListener {
         }
     }
 
+    private fun handleConnectState() {
+        binding.connect.setText(R.string.connecting)
+        binding.connect.isEnabled = false
+
+        service.listenSocket({
+            GlobalScope.launch {
+                withContext(Dispatchers.Main) {
+                    binding.connect.isEnabled = true
+                    binding.connect.setText(
+                        if (it) {
+                            isConnectState = false
+                            R.string.disconnect
+                        } else {
+                            isConnectState = true
+                            R.string.connect
+                        }
+                    )
+                }
+            }
+        }) {
+            adapter.addItem(it)
+            binding.recyclerView.smoothScrollToPosition(0)
+        }
+    }
+
     private fun initRecyclerView() {
         val manager = LinearLayoutManager(requireContext())
         binding.recyclerView.layoutManager = manager
-        adapter = RecyclerViewAdapter(requireContext(), emptyList())
+        adapter = ListAdapter(requireContext(), emptyList())
         adapter.setClickListener(this)
         binding.recyclerView.adapter = adapter
     }
@@ -86,10 +93,10 @@ class FirstFragment : Fragment(), RecyclerViewAdapter.ItemClickListener {
     override fun onItemClick(view: ImageView, color: Int) {
         val detailIntent = Intent(requireActivity(), DetailActivity::class.java)
         val imageViewPair =
-            androidx.core.util.Pair<View, String>(view, "CircleTransition")
+            androidx.core.util.Pair<View, String>(view, getString(R.string.circle_transition))
         val options =
             ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity(), imageViewPair)
-        detailIntent.putExtra("color", color)
+        detailIntent.putExtra(getString(R.string.color_key), color)
         startActivity(detailIntent, options.toBundle())
     }
 

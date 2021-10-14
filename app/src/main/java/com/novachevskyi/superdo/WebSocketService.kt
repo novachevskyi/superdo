@@ -14,7 +14,7 @@ class WebSocketService {
     private var isDisconnecting = false
 
     fun listenSocket(connectedCallback: (Boolean) -> Unit, dataCallback: (DataModel) -> Unit) {
-        webSocket = WebSocketFactory().createSocket("ws://superdo-groceries.herokuapp.com/receive", 5000).apply {
+        webSocket = WebSocketFactory().createSocket(URL, TIMEOUT).apply {
             addListener(object: WebSocketAdapter() {
                 override fun onTextMessage(websocket: WebSocket, message: String) {
                     super.onTextMessage(websocket, message)
@@ -57,5 +57,11 @@ class WebSocketService {
                 webSocket?.disconnect()
             }
         }
+    }
+
+    companion object {
+        const val URL = "ws://superdo-groceries.herokuapp.com/receive"
+
+        const val TIMEOUT = 5000
     }
 }

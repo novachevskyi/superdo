@@ -12,7 +12,7 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        val color = intent.extras?.getInt("color")
+        val color = intent.extras?.getInt(getString(R.string.color_key))
 
         window.sharedElementEnterTransition.addListener(object : Transition.TransitionListener {
             override fun onTransitionEnd(transition: Transition?) {
